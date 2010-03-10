@@ -41,13 +41,13 @@
   </listener>
 
   <context-param>
-      <param-name>contextConfigLocation</param-name>
-      <param-value>classpath:spring.xml</param-value>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:spring.xml</param-value>
   </context-param>
 
 
   <welcome-file-list>
-    <welcome-file>domains</welcome-file>
+    <welcome-file>root</welcome-file>
   </welcome-file-list>
 
 </web-app>
