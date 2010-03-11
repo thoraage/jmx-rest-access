@@ -33,7 +33,7 @@
 
   <filter-mapping>
     <filter-name>Jersey</filter-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/rest/*</url-pattern>
   </filter-mapping>
 
   <listener>
@@ -47,7 +47,7 @@
 
 
   <welcome-file-list>
-    <welcome-file>root</welcome-file>
+    <welcome-file>root.xhtml</welcome-file>
   </welcome-file-list>
 
 </web-app>
