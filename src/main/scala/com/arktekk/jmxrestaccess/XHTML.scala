@@ -17,7 +17,10 @@ object XHTML {
       <body>
         <h1>
           {title}
-        </h1>{content}
+        </h1>
+        <span class="management">
+          {content}
+        </span>
       </body>
     </html>
   }

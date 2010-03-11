@@ -9,12 +9,11 @@
 
   <context:component-scan base-package="com.arktekk.jmxrestaccess" scoped-proxy="targetClass">
     <context:include-filter type="annotation" expression="javax.ws.rs.Path"/>
+    <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider"/>
     <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
     <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Component"/>
     <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
     <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
   </context:component-scan>
-
-  <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" scope="singleton"/>
 
 </beans>
