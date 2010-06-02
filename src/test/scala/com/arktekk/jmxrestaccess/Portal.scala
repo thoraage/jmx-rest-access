@@ -10,7 +10,6 @@ import org.mortbay.jetty.webapp.WebAppContext
  */
 object Portal {
   def main(args: Array[String]): Unit = new PortalImpl
-
 }
 
 class PortalImpl {
