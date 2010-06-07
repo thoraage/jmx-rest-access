@@ -16,18 +16,27 @@ import com.sun.jersey.core.util.Base64
 object JMXHelper {
   val realm = "JMX multi-host domain"
 
-  def getMBeanServerConnection: MBeanServerConnection = getMBeanServerConnection("admin", "adminadmin", "localhost:8686")
+  //def getMBeanServerConnection: MBeanServerConnection = getMBeanServerConnection("admin", "adminadmin", "localhost:8686")
 
   def getMBeanServerConnection(request: HttpServletRequest, host: String): MBeanServerConnection = {
     val connection = request.getSession.getAttribute(host).asInstanceOf[MBeanServerConnection]
+    def throwUnauthorisedException: Unit = {
+      val response = Response.status(Response.Status.UNAUTHORIZED).header("WWW-Authenticate", "Basic realm=\"" + realm + "\"").build
+      throw new WebApplicationException(response)
+    }
     if (connection == null) {
       val authorisation = request.getHeader("Authorization")
       if (authorisation != null) {
-        val credentials: (String, String) = AuthorisationParser.find(authorisation)
-        request.getSession.setAttribute(host, getMBeanServerConnection(credentials._1, credentials._2, host))
+        try {
+          val credentials: (String, String) = AuthorisationParser.find(authorisation)
+          val connection = getMBeanServerConnection(credentials._1, credentials._2, host)
+          request.getSession.setAttribute(host, connection)
+          return connection
+        } catch {
+          case e: Exception => throwUnauthorisedException
+        }
       } else {
-        val response = Response.status(Response.Status.UNAUTHORIZED).header("WWW-Authenticate", "Basic realm=\"" + realm + "\"").build
-        throw new WebApplicationException(response)
+        throwUnauthorisedException
       }
     }
     return connection

@@ -14,7 +14,7 @@ class DomainResource {
       <ul>
         {domains.map({
         domain => <li>
-          <a class="domain" href={UriBuilderHelper.cloneBaseUriBuilder(uriInfo).path(classOf[MBeanResource]).queryParam("domainName", domain).build().toString}>
+          <a class="domain" href={UriBuilderHelper.cloneBaseUriBuilder(uriInfo).path(classOf[MBeanResource]).queryParam("domainName", domain).build(host).toString}>
             {domain}
           </a>
         </li>
