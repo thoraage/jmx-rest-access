@@ -18,7 +18,7 @@ object DomainResourceSpec extends Specification with Mockito {
 
     "return list of resources" in {
       val domainResource = new DomainResource {
-        def jmxHelper = new JMXHelperI {
+        def jmxHelper = new JMXHelper {
           def getMBeanServerConnection(request: HttpServletRequest, host: String): MBeanServerConnection = {
             val mBeanServerConnection = mock[MBeanServerConnection]
             doReturn(Array("Domain1").asInstanceOf[scala.runtime.BoxedAnyArray].unbox(classOf[String])).when(mBeanServerConnection).getDomains()

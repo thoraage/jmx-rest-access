@@ -18,9 +18,9 @@ class MBeanResource {
   def getAll(@Context uriInfo: UriInfo, @QueryParam("domainName") domainName: String, @Context request: HttpServletRequest, @PathParam("host") host: String): Elem = {
     val objectName = if (domainName != null) new ObjectName(domainName + ":*") else null
     val objectNames = new SetWrapper[ObjectName] {
-      def underlying = JMXHelper.getMBeanServerConnection(request, host).queryNames(objectName, null)
+      def underlying = JMXHelperImpl.getMBeanServerConnection(request, host).queryNames(objectName, null)
     }
-    XHTML.createHead(if (domainName == null) "All Managed Beans" else "Managed Beans in Domain " + domainName,
+    JmxAccessXhtml.createHead(if (domainName == null) "All Managed Beans" else "Managed Beans in Domain " + domainName,
       <ul>
         {objectNames.map({
         objectName =>
@@ -35,8 +35,8 @@ class MBeanResource {
   @Path("{domainAndKeys}")
   def get(@Context uriInfo: UriInfo, @PathParam("domainAndKeys") domainAndKeys: String, @Context request: HttpServletRequest, @PathParam("host") host: String): Elem = {
     val objectName: ObjectName = new ObjectName(URLDecoder.decode(domainAndKeys, "UTF-8"))
-    val info = JMXHelper.getMBeanServerConnection(request, host).getMBeanInfo(objectName)
-    XHTML.createHead("Managed Bean " + domainAndKeys + " with attributes",
+    val info = JMXHelperImpl.getMBeanServerConnection(request, host).getMBeanInfo(objectName)
+    JmxAccessXhtml.createHead("Managed Bean " + domainAndKeys + " with attributes",
       createMBeanA(objectName, uriInfo, host,
         <ul>
           {info.getAttributes.map(attributeInfo =>

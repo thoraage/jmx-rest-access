@@ -10,10 +10,16 @@ import javax.ws.rs._
 
 @Path("rest/{host}/view")
 @Produces(Array(MediaType.APPLICATION_XML))
-class ViewResource {
+class ViewResourceImpl extends ViewResource {
+  def jmxHelper = JMXHelperImpl
+}
+
+trait ViewResource {
+  def jmxHelper: JMXHelper
+
   @GET
   def getAll(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String) = {
-    XHTML.createHead("Views",
+    JmxAccessXhtml.createHead("Views",
         <ul/>
       );
   }
@@ -21,7 +27,7 @@ class ViewResource {
   @Path("{view}")
   @GET
   def get(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String, @PathParam("view") view: String) = {
-    XHTML.createHead("Views",
+    JmxAccessXhtml.createHead("Views",
         <ul/>
       );
   }
@@ -29,7 +35,7 @@ class ViewResource {
   @Path("{view}/item/{item}")
   @PUT
   def get(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String, @PathParam("view") view: String, @PathParam("item") item: String) = {
-    XHTML.createHead("Views",
+    JmxAccessXhtml.createHead("Views",
         <ul/>
       );
   }
@@ -37,7 +43,7 @@ class ViewResource {
   @Path("{view}/item")
   @GET
   def getItem(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String, @PathParam("view") view: String, @PathParam("item") item: String) = {
-    XHTML.createHead("Views",
+    JmxAccessXhtml.createHead("Views",
         <ul/>
       );
   }

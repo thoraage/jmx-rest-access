@@ -13,7 +13,7 @@ import javax.ws.rs.core.{UriInfo, Context, MediaType}
 class RootResource {
   @GET
   def get(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String) = {
-    XHTML.createHead("Root",
+    JmxAccessXhtml.createHead("Root",
       <ul>
         <li>
           <a class="domains" href={UriBuilderHelper.cloneBaseUriBuilder(uriInfo).path(classOf[DomainResource]).build(host).toString}>

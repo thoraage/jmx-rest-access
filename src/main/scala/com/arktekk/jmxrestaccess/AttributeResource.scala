@@ -15,8 +15,8 @@ class AttributeResource {
   @GET
   @Path("{attributeName}")
   def get(@PathParam("domainAndKeys") domainAndKeys: String, @PathParam("attributeName") attributeName: String, @Context request: HttpServletRequest, @PathParam("host") host: String) = {
-    val value = JMXHelper.getMBeanServerConnection(request, host).getAttribute(new ObjectName(URLDecoder.decode(domainAndKeys, "UTF-8")), attributeName)
-    XHTML.createHead("Attribute " + attributeName,
+    val value = JMXHelperImpl.getMBeanServerConnection(request, host).getAttribute(new ObjectName(URLDecoder.decode(domainAndKeys, "UTF-8")), attributeName)
+    JmxAccessXhtml.createHead("Attribute " + attributeName,
       <div class="value">
         {value.toString}
       </div>)

@@ -26,7 +26,7 @@ class CustomExceptionMapper extends ExceptionMapper[JMException] {
       (Response.Status.INTERNAL_SERVER_ERROR, null)
     CustomExceptionMapper.logger.error("Error from resources", ex)
     Response.status(status).entity(
-      XHTML.createHead(status.getReasonPhrase,
+      JmxAccessXhtml.createHead(status.getReasonPhrase,
         <span class="management error">
           {message}
           -

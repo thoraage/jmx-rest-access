@@ -7,17 +7,16 @@ import javax.servlet.http.HttpServletRequest
 @Path("rest/{host}/domains")
 @Produces(Array(MediaType.APPLICATION_XML))
 class DomainResourceImpl extends DomainResource {
-  def jmxHelper = JMXHelper
-
+  def jmxHelper = JMXHelperImpl
 }
 
 trait DomainResource {
-  def jmxHelper: JMXHelperI
+  def jmxHelper: JMXHelper
 
   @GET
   def getAll(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String) = {
     val domains = jmxHelper.getMBeanServerConnection(request, host).getDomains
-    XHTML.createHead("Domains",
+    JmxAccessXhtml.createHead("Domains",
       <ul>
         {domains.map({
         domain => <li>
