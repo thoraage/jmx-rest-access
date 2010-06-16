@@ -1,6 +1,10 @@
 package com.arktekk.jmxrestaccess
 
 import java.io.File
+import com.sun.jersey.core.util.MultivaluedMapImpl
+import javax.ws.rs.core.{UriBuilder, PathSegment, UriInfo}
+import java.util.ArrayList
+import java.net.URI
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
@@ -31,6 +35,45 @@ object TestHelper {
       throw new RuntimeException("Unable to find web application directory")
     }
     dir.toString()
+  }
+
+  def getUriInfo = {
+    val arktekk = new URI("http://arktekk.no/")
+    new UriInfo() {
+      override def getPath() = arktekk.getPath()
+
+      override def getPath(decode: Boolean) = getPath()
+
+      override def getPathSegments() = new ArrayList[PathSegment]()
+
+      override def getPathSegments(decode: Boolean) = getPathSegments()
+
+      override def getRequestUri = arktekk
+
+      override def getRequestUriBuilder = UriBuilder.fromUri(arktekk)
+
+      override def getAbsolutePath() = arktekk
+
+      override def getAbsolutePathBuilder() = UriBuilder.fromUri(arktekk)
+
+      override def getBaseUri = arktekk
+
+      override def getBaseUriBuilder = UriBuilder.fromUri(arktekk)
+
+      override def getPathParameters = new MultivaluedMapImpl()
+
+      override def getPathParameters(decode: Boolean) = getPathParameters()
+
+      override def getQueryParameters = getPathParameters()
+
+      override def getQueryParameters(decode: Boolean) = getPathParameters()
+
+      override def getMatchedURIs() = new ArrayList[String]() { {add(arktekk.getPath())}}
+
+      override def getMatchedURIs(decode: Boolean) = getMatchedURIs()
+
+      override def getMatchedResources() = new ArrayList[Object]()
+    }
   }
 
 }

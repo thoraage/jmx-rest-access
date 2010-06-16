@@ -6,10 +6,17 @@ import javax.servlet.http.HttpServletRequest
 
 @Path("rest/{host}/domains")
 @Produces(Array(MediaType.APPLICATION_XML))
-class DomainResource {
+class DomainResourceImpl extends DomainResource {
+  def jmxHelper = JMXHelper
+
+}
+
+trait DomainResource {
+  def jmxHelper: JMXHelperI
+
   @GET
   def getAll(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String) = {
-    val domains = JMXHelper.getMBeanServerConnection(request, host).getDomains
+    val domains = jmxHelper.getMBeanServerConnection(request, host).getDomains
     XHTML.createHead("Domains",
       <ul>
         {domains.map({
@@ -21,4 +28,5 @@ class DomainResource {
       })}
       </ul>)
   }
+
 }

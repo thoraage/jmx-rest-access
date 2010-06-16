@@ -12,8 +12,11 @@ import com.sun.jersey.core.util.Base64
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
  */
+trait JMXHelperI {
+  def getMBeanServerConnection(request: HttpServletRequest, host: String): MBeanServerConnection
+}
 
-object JMXHelper {
+object JMXHelper extends JMXHelperI {
   val realm = "JMX multi-host domain"
 
   //def getMBeanServerConnection: MBeanServerConnection = getMBeanServerConnection("admin", "adminadmin", "localhost:8686")
