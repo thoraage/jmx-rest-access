@@ -5,6 +5,9 @@ import com.sun.jersey.core.util.MultivaluedMapImpl
 import javax.ws.rs.core.{UriBuilder, PathSegment, UriInfo}
 import java.util.ArrayList
 import java.net.URI
+import xml.Elem
+
+import XmlHelper._
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
@@ -74,6 +77,10 @@ object TestHelper {
 
       override def getMatchedResources() = new ArrayList[Object]()
     }
+  }
+
+  def getManagementElement(document: Elem) = {
+    document \\ "html" \ "body" \ "span" whereAt ("class", _ == "management")
   }
 
 }
