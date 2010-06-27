@@ -8,6 +8,7 @@ import java.net.URI
 import xml.Elem
 
 import XmlHelper._
+import FileHelper._
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
@@ -22,7 +23,7 @@ object TestHelper {
       if (!file.exists()) {
         throw new RuntimeException("Unable to find basedir")
       }
-      while (!new File(file, "pom.xml").exists()) {
+      while (!(file /? "pom.xml").exists()) {
         file = file.getParentFile()
         if (file == null) {
           throw new RuntimeException("Unable to find basedir")
@@ -32,13 +33,11 @@ object TestHelper {
     }
   }
 
-  def getWebAppDir(aClass: Class[_]): String = {
-    val dir = new File(getBaseDir(aClass), "src/main/webapp")
-    if (!dir.exists()) {
-      throw new RuntimeException("Unable to find web application directory")
-    }
-    dir.toString()
-  }
+  def getSubBaseDir(aClass: Class[_], directory: String) = getBaseDir(aClass) / directory
+
+  def getTargetDir(aClass: Class[_]) = getBaseDir(aClass) / "target"
+
+  def getWebAppDir(aClass: Class[_]) = getBaseDir(aClass) / "src/main/webapp"
 
   def getUriInfo = {
     val arktekk = new URI("http://arktekk.no/")

@@ -5,9 +5,9 @@ import org.junit.runner.RunWith
 import org.specs.runner.{JUnitSuiteRunner, JUnit4}
 import javax.ws.rs.core.UriInfo
 import java.lang.String
-import xml.Elem
-
 import XmlHelper._
+import xml.Elem
+import FileHelper._
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
@@ -16,26 +16,45 @@ import XmlHelper._
 @RunWith(classOf[JUnitSuiteRunner])
 class ViewResourceRunAsTest extends JUnit4(ViewResourceSpec)
 object ViewResourceSpec extends Specification {
-  "before any views are created we get only a empty list with a template" in {
-    val viewResource = new ViewResource {
-      override def getJmxHelper = error("Not implemented")
-    }
-    val uriInfo: UriInfo = TestHelper.getUriInfo
-    val host: String = "anyhost:8080"
+  val repositoryDirectory = TestHelper.getTargetDir(this.getClass) /! "junittestrepository"
+  val viewResource = new ViewResource {
+    override def getJmxHelper = error("Not implemented")
+
+    override def getRepositoryDirectory = repositoryDirectory
+  }
+  val uriInfo: UriInfo = TestHelper.getUriInfo
+  val host: String = "anyhost:8080"
+
+  def views = {
     val document: Elem = viewResource.getAll(uriInfo, null, host)
-    val template = (TestHelper.getManagementElement(document) \\ "span" whereAt ("class", {_.text == "create-template"})).text
-    template must_== "http://arktekk.no/rest/{host}/view"
+    val elements = TestHelper.getManagementElement(document)
+    val template = (elements \\ "span" whereAt ("class", {_.text == "create-template"})).text.trim
+    template must_== "http://arktekk.no/rest/{host}/view/{view}/items/{item}"
+    val views = (elements \\ "li" whereAt ("class", {_.text == "views"})) \ "_" // flatMap {node => List(node.elements)}
+    views
   }
 
-  /*"create new view and view items" in {
-    val elem = JmxAccessXhtml.createHead("View", <a class="item" href="/rest/anyhost:8080/mbean/....1">Name1</a>)
-    viewResource.create(uriInfo, null, host, "MyView", "Name1", elem)
-    val elem2 = JmxAccessXhtml.createHead("View", <a class="item" href="/rest/anyhost:8080/mbean/....2">Name2</a>)
-    viewResource.create(uriInfo, null, host, "MyView", "Name2", elem2)
+  try {
+    "before any views are created we get only a empty list with a template" in {
+      views.size must_== 0
 
+      "create new view and view items" in {
+        val elem1 = <span class="item">
+            <a href="/rest/anyhost:8080/mbean/....1"/>
+        </span>
+        viewResource.createItem(uriInfo, null, host, "MyView", "Name1", elem1)
+        val elem2 = <span class="item">
+            <a href="/rest/anyhost:8080/mbean/....2"/>
+        </span>
+        viewResource.createItem(uriInfo, null, host, "MyView", "Name2", elem2)
+
+        "views can be listed" in {
+          views.size must_== 1
+        }
+      }
+    }
+  } finally {
+    repositoryDirectory.deleteAll
   }
-  
-  "views can be listed" in {
-  }*/
 
 }
