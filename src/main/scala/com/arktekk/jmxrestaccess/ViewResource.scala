@@ -7,6 +7,9 @@ import FileHelper._
 import java.io.{FileOutputStream, File}
 import java.nio.channels.Channels
 import xml.{XML, Elem}
+import com.sun.jersey.api.NotFoundException
+import xml.parsing.ConstructingParser
+import io.Source
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
@@ -27,7 +30,7 @@ trait ViewResource {
 
   @GET
   def getAll(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String) = {
-    val views = (getRepositoryDirectory /? host).doOrElse({_.listFiles.map(_.getName.replaceAll(".xml", ""))}, Array[String]())
+    val views = (getRepositoryDirectory /? host).doOrElse({_.listFiles.map(_.getName.replaceAll(".xml", ""))}, {_ => Array[String]()})
     val viewLinks = views.map {
       view =>
         val url = UriBuilderHelper.cloneBaseUriBuilder(uriInfo).path(classOf[ViewResourceImpl]).path(classOf[ViewResourceImpl], "getView").build(host, view)
@@ -44,12 +47,19 @@ trait ViewResource {
       </span>)
   }
 
-  @Path("{view}")
+  @Path("{view}/state")
   @GET
   def getView(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String, @PathParam("view") view: String) = {
-    JmxAccessXhtml.createHead("Views",
-        <ul/>
-      )
+    val itemFiles = (getRepositoryDirectory /? host /? view).doOrElse({_.listFiles}, {_ => throw new NotFoundException})
+    val items = itemFiles.map {
+      itemFile =>
+        val document = ConstructingParser.fromSource(Source.fromFile(itemFile), false).document.docElem(0)
+        val href = (document \ "span" \ "a" \ "@href").text.trim
+        <span id={itemFile.getNameWithoutExtension}>
+        </span>
+      //{getJmxHelper.getMBeanServerConnection(request, host).getAttribute(new ObjectName(), )}
+    }
+    JmxAccessXhtml.createHead("Views", items)
   }
 
   @Path("{view}/items/{item}")
@@ -59,14 +69,6 @@ trait ViewResource {
     using(Channels.newWriter(new FileOutputStream(file).getChannel, UTF8)) {
       writer => XML.write(writer, document, UTF8, true, null)
     }
-  }
-
-  @Path("{view}/item")
-  @GET
-  def getItem(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String, @PathParam("view") view: String, @PathParam("item") item: String) = {
-    JmxAccessXhtml.createHead("Views",
-        <ul/>
-      )
   }
 
 }

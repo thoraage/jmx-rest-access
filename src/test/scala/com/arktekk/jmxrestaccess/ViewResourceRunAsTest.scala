@@ -8,6 +8,7 @@ import java.lang.String
 import XmlHelper._
 import xml.Elem
 import FileHelper._
+import org.specs.mock.Mockito
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
@@ -15,7 +16,7 @@ import FileHelper._
 
 @RunWith(classOf[JUnitSuiteRunner])
 class ViewResourceRunAsTest extends JUnit4(ViewResourceSpec)
-object ViewResourceSpec extends Specification {
+object ViewResourceSpec extends Specification with Mockito {
   val repositoryDirectory = TestHelper.getTargetDir(this.getClass) /! "junittestrepository"
   val viewResource = new ViewResource {
     override def getJmxHelper = error("Not implemented")
@@ -30,7 +31,7 @@ object ViewResourceSpec extends Specification {
     val elements = TestHelper.getManagementElement(document)
     val template = (elements \\ "span" whereAt ("class", {_.text == "create-template"})).text.trim
     template must_== "http://arktekk.no/rest/{host}/view/{view}/items/{item}"
-    val views = (elements \\ "li" whereAt ("class", {_.text == "views"})) \ "_" // flatMap {node => List(node.elements)}
+    val views = (elements \\ "li" whereAt ("class", {_.text == "views"})) \ "_"
     views
   }
 
@@ -39,17 +40,25 @@ object ViewResourceSpec extends Specification {
       views.size must_== 0
 
       "create new view and view items" in {
-        val elem1 = <span class="item">
-            <a href="/rest/anyhost:8080/mbean/....1"/>
+        val elem1 = <span>
+            <a href="/rest/anyhost:8080/mbeans/....1"/>
         </span>
-        viewResource.createItem(uriInfo, null, host, "MyView", "Name1", elem1)
-        val elem2 = <span class="item">
-            <a href="/rest/anyhost:8080/mbean/....2"/>
+        val viewName = "MyView"
+        viewResource.createItem(uriInfo, null, host, viewName, "Name1", elem1)
+        val elem2 = <span>
+            <a href="/rest/anyhost:8080/mbeans/....2"/>
         </span>
-        viewResource.createItem(uriInfo, null, host, "MyView", "Name2", elem2)
+        viewResource.createItem(uriInfo, null, host, viewName, "Name2", elem2)
 
         "views can be listed" in {
           views.size must_== 1
+          (views \ "@href").text must_== "http://arktekk.no/rest/anyhost:8080/view/MyView/state"
+        }
+
+        "view item states can be retrieved" in {
+          val items = TestHelper.getManagementElement(viewResource.getView(uriInfo, null, host, viewName))
+          (items \ "span").whereAt("id", _ == "Name1").text.trim must_== "value1"
+          (items \ "span").whereAt("id", _ == "Name2").text.trim must_== "value2"
         }
       }
     }

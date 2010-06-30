@@ -1,13 +1,13 @@
 package com.arktekk.jmxrestaccess
 
-import xml.Elem
+import xml.{NodeSeq, Elem}
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
  */
 
 object JmxAccessXhtml {
-  def createHead(title: String, content: Elem): Elem = {
+  def createHead(title: String, content: NodeSeq): Elem = {
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
       <head>
         <title>

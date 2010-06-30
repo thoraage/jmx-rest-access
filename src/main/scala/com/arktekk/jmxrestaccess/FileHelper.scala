@@ -33,9 +33,11 @@ object FileHelper {
       newDir
     }
 
-    def doOrElse[I, O](f: (File => O), other: O): O = if (file.exists) f(file) else other
+    def doOrElse[I, O](f: (File => O), other: (Unit => O)): O = if (file.exists) f(file) else other()
 
     def deleteAll: Unit = if (file.exists) FileHelper.deleteAll(file)
+
+    def getNameWithoutExtension: String = file.getName.replaceFirst("\\.[^\\.]*", "")
   }
 
   def deleteAll(file: File): Unit = {

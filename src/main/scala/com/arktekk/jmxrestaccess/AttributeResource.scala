@@ -14,8 +14,10 @@ import javax.ws.rs.core.{Context, MediaType}
 class AttributeResource {
   @GET
   @Path("{attributeName}")
-  def get(@PathParam("domainAndKeys") domainAndKeys: String, @PathParam("attributeName") attributeName: String, @Context request: HttpServletRequest, @PathParam("host") host: String) = {
-    val value = JMXHelperImpl.getMBeanServerConnection(request, host).getAttribute(new ObjectName(URLDecoder.decode(domainAndKeys, "UTF-8")), attributeName)
+  def get(@PathParam("domainAndKeys") urlEncodedDomainAndKeys: String, @PathParam("attributeName") attributeName: String, @Context request: HttpServletRequest, @PathParam("host") host: String) = {
+    val connection = JMXHelperImpl.getMBeanServerConnection(request, host)
+    val domainAndKeys = URLDecoder.decode(urlEncodedDomainAndKeys, "UTF-8")
+    val value = connection.getAttribute(new ObjectName(domainAndKeys), attributeName)
     JmxAccessXhtml.createHead("Attribute " + attributeName,
       <div class="value">
         {value.toString}
