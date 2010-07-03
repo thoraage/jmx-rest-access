@@ -9,6 +9,7 @@ import XmlHelper._
 import xml.Elem
 import FileHelper._
 import org.specs.mock.Mockito
+import javax.management.{ObjectName, MBeanServerConnection}
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
@@ -18,19 +19,27 @@ import org.specs.mock.Mockito
 class ViewResourceRunAsTest extends JUnit4(ViewResourceSpec)
 object ViewResourceSpec extends Specification with Mockito {
   val repositoryDirectory = TestHelper.getTargetDir(this.getClass) /! "junittestrepository"
+  val host: String = "anyhost:8080"
+  val uriInfo: UriInfo = TestHelper.getUriInfo
+
   val viewResource = new ViewResource {
-    override def getJmxHelper = error("Not implemented")
+    override def getJmxHelper = {
+      val jmxHelper = mock[JMXHelper]
+      val connection = mock[MBeanServerConnection]
+      doReturn(connection).when(jmxHelper).getMBeanServerConnection(null, host)
+      doReturn("value1").when(connection).getAttribute(new ObjectName("d:k=v"), "attrName1")
+      doReturn("value2").when(connection).getAttribute(new ObjectName("d:k=v"), "attrName2")
+      jmxHelper
+    }
 
     override def getRepositoryDirectory = repositoryDirectory
   }
-  val uriInfo: UriInfo = TestHelper.getUriInfo
-  val host: String = "anyhost:8080"
 
   def views = {
     val document: Elem = viewResource.getAll(uriInfo, null, host)
     val elements = TestHelper.getManagementElement(document)
     val template = (elements \\ "span" whereAt ("class", {_.text == "create-template"})).text.trim
-    template must_== "http://arktekk.no/rest/{host}/view/{view}/items/{item}"
+    template must_== "http://arktekk.no/rest/{host}/views/{view}/items/{item}"
     val views = (elements \\ "li" whereAt ("class", {_.text == "views"})) \ "_"
     views
   }
@@ -41,18 +50,18 @@ object ViewResourceSpec extends Specification with Mockito {
 
       "create new view and view items" in {
         val elem1 = <span>
-            <a href="/rest/anyhost:8080/mbeans/....1"/>
+            <a href="/rest/anyhost:8080/rest/host/mbeans/d:k=v/attributes/attrName1"/>
         </span>
         val viewName = "MyView"
         viewResource.createItem(uriInfo, null, host, viewName, "Name1", elem1)
         val elem2 = <span>
-            <a href="/rest/anyhost:8080/mbeans/....2"/>
+            <a href="/rest/anyhost:8080/rest/host/mbeans/d:k=v/attributes/attrName2"/>
         </span>
         viewResource.createItem(uriInfo, null, host, viewName, "Name2", elem2)
 
         "views can be listed" in {
           views.size must_== 1
-          (views \ "@href").text must_== "http://arktekk.no/rest/anyhost:8080/view/MyView/state"
+          (views \ "@href").text must_== "http://arktekk.no/rest/anyhost:8080/views/MyView/state"
         }
 
         "view item states can be retrieved" in {

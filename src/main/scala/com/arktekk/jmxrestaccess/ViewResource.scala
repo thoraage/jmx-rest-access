@@ -10,12 +10,13 @@ import xml.{XML, Elem}
 import com.sun.jersey.api.NotFoundException
 import xml.parsing.ConstructingParser
 import io.Source
+import javax.management.ObjectName
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
  */
 
-@Path("rest/{host}/view")
+@Path("rest/{host}/views")
 @Produces(Array(MediaType.APPLICATION_XML))
 class ViewResourceImpl extends ViewResource {
   def getJmxHelper = JMXHelperImpl
@@ -51,13 +52,19 @@ trait ViewResource {
   @GET
   def getView(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String, @PathParam("view") view: String) = {
     val itemFiles = (getRepositoryDirectory /? host /? view).doOrElse({_.listFiles}, {_ => throw new NotFoundException})
+    val connection = getJmxHelper.getMBeanServerConnection(request, host)
     val items = itemFiles.map {
       itemFile =>
         val document = ConstructingParser.fromSource(Source.fromFile(itemFile), false).document.docElem(0)
-        val href = (document \ "span" \ "a" \ "@href").text.trim
-        <span id={itemFile.getNameWithoutExtension}>
-        </span>
-      //{getJmxHelper.getMBeanServerConnection(request, host).getAttribute(new ObjectName(), )}
+        val href = (document \ "a" \ "@href").text.trim
+        val parser = ".*/mbeans/(.*)/attributes/(.*)".r
+        href match {
+          case parser(mbeanName, attributeName) =>
+            val value = connection.getAttribute(new ObjectName(mbeanName), attributeName);
+            <span id={itemFile.getNameWithoutExtension}>
+              {value}
+            </span>
+        }
     }
     JmxAccessXhtml.createHead("Views", items)
   }
