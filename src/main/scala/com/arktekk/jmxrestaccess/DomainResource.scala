@@ -1,26 +1,43 @@
 package com.arktekk.jmxrestaccess
 
-import javax.ws.rs.{PathParam, Produces, GET, Path}
-import javax.ws.rs.core._
-import javax.servlet.http.HttpServletRequest
+import xml.Elem
+import net.liftweb.http.rest.RestHelper
+import net.liftweb.http._
 
-@Path("rest/{host}/domains")
-@Produces(Array(MediaType.APPLICATION_XML))
-class DomainResourceImpl extends DomainResource {
+object DomainResourceImpl extends DomainResource with RestHelper {
   def jmxHelper = JMXHelperImpl
+
+  serve {
+    case req@Req(DomainGet(host), _, GetRequest) =>
+      try {
+        getAll(req, host)
+      } catch {
+        case ResponseException(msg, response) => ResponseWithReason(response, msg)
+      }
+  }
+
+}
+
+object DomainGet {
+  def apply(host: String) = host :: "domains" :: Nil
+
+  def unapply(path: List[String]): Option[String] =
+    path match {
+      case host :: "domains" :: Nil => Some(host)
+      case _ => None
+    }
 }
 
 trait DomainResource {
   def jmxHelper: JMXHelper
 
-  @GET
-  def getAll(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String) = {
-    val domains = jmxHelper.getMBeanServerConnection(request, host).getDomains
+  def getAll(req: Req, host: String): Elem = {
+    val domains = jmxHelper.getMBeanServerConnection(req, host).getDomains
     JmxAccessXhtml.createHead("Domains",
       <ul>
         {domains.map({
         domain => <li>
-          <a class="domain" href={UriBuilderHelper.cloneBaseUriBuilder(uriInfo).path(classOf[MBeanResource]).queryParam("domainName", domain).build(host).toString}>
+          <a class="domain" href={"tull"}>
             {domain}
           </a>
         </li>

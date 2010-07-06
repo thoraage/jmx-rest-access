@@ -26,7 +26,7 @@ object ViewResourceSpec extends Specification with Mockito {
     override def getJmxHelper = {
       val jmxHelper = mock[JMXHelper]
       val connection = mock[MBeanServerConnection]
-      doReturn(connection).when(jmxHelper).getMBeanServerConnection(null, host)
+      //doReturn(connection).when(jmxHelper).getMBeanServerConnection(null, host)
       doReturn("value1").when(connection).getAttribute(new ObjectName("d:k=v"), "attrName1")
       doReturn("value2").when(connection).getAttribute(new ObjectName("d:k=v"), "attrName2")
       jmxHelper

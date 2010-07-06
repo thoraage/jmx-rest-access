@@ -8,18 +8,48 @@ import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.{Response}
 import scala.util.parsing.combinator._
 import com.sun.jersey.core.util.Base64
+import net.liftweb.common.{Full, Box}
+import net.liftweb.http.{LiftResponse, UnauthorizedResponse, SessionVar, Req}
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
  */
 trait JMXHelper {
   def getMBeanServerConnection(request: HttpServletRequest, host: String): MBeanServerConnection
+
+  def getMBeanServerConnection(req: Req, host: String): MBeanServerConnection
 }
+
+case class ResponseException(msg: String, response: LiftResponse) extends RuntimeException(msg)
 
 object JMXHelperImpl extends JMXHelper {
   val realm = "JMX multi-host domain"
 
-  //def getMBeanServerConnection: MBeanServerConnection = getMBeanServerConnection("admin", "adminadmin", "localhost:8686")
+  object connectionMapVar extends SessionVar[Map[String, MBeanServerConnection]](Map())
+
+  def getMBeanServerConnection(req: Req, host: String): MBeanServerConnection = {
+    def unauthorisedException: Exception = {
+      new ResponseException("", UnauthorizedResponse(realm))
+    }
+    connectionMapVar.get.get(host) match {
+      case None =>
+        req.header("Authorization") match {
+          case Full(authorisation) =>
+            try {
+              val credentials: (String, String) = AuthorisationParser.find(authorisation)
+              val connection = getMBeanServerConnection(credentials._1, credentials._2, host)
+              connectionMapVar(connectionMapVar.get + (host -> connection))
+              connection
+            } catch {
+              case e: Exception => throw unauthorisedException
+            }
+          case _ =>
+            throw unauthorisedException
+        }
+      case Some(connection) =>
+        connection
+    }
+  }
 
   def getMBeanServerConnection(request: HttpServletRequest, host: String): MBeanServerConnection = {
     val connection = request.getSession.getAttribute(host).asInstanceOf[MBeanServerConnection]

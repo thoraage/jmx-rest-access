@@ -11,6 +11,17 @@
 
   <dependencies>
     <dependency>
+      <groupId>net.liftweb</groupId>
+      <artifactId>lift-mapper</artifactId>
+      <version>${lift.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.mail</groupId>
+          <artifactId>mail</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-server</artifactId>
       <version>${jersey.version}</version>
@@ -98,6 +109,10 @@
       <id>java.net</id>
       <url>http://download.java.net/maven/2/</url>
     </repository>
+    <repository>
+      <id>scala-tools</id>
+      <url>http://scala-tools.org/repo-releases/</url>
+    </repository>
   </repositories>
 
   <build>
@@ -129,6 +144,7 @@
     <spring.version>3.0.2.RELEASE</spring.version>
     <jersey.version>1.2</jersey.version>
     <scala.version>2.7.7</scala.version>
+    <lift.version>2.0</lift.version>
   </properties>
 
 </project>

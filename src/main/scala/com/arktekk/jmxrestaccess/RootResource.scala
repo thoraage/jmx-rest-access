@@ -3,6 +3,8 @@ package com.arktekk.jmxrestaccess
 import javax.ws.rs.{PathParam, GET, Produces, Path}
 import javax.servlet.http.HttpServletRequest
 import javax.ws.rs.core.{UriInfo, Context, MediaType}
+import net.liftweb.http.rest.RestHelper
+import net.liftweb.http.{Req}
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
@@ -10,7 +12,17 @@ import javax.ws.rs.core.{UriInfo, Context, MediaType}
 
 @Path("rest/{host}")
 @Produces(Array(MediaType.APPLICATION_XML))
-class RootResource {
+object RootResource extends RestHelper {
+  object Tull {
+    def unapply(r: Req): Option[(List[String], Req)] = Some(r.path.partPath -> r)
+  }
+
+  serve {
+    case req@Tull(host :: Nil, _) => <ba>
+      {req.toString}
+    </ba>
+  }
+
   @GET
   def get(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String) = {
     JmxAccessXhtml.createHead("Root",
