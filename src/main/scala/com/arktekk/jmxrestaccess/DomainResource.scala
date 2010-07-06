@@ -1,5 +1,6 @@
 package com.arktekk.jmxrestaccess
 
+import util.JmxAccessXhtml
 import xml.Elem
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.http._

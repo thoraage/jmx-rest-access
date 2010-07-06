@@ -5,9 +5,9 @@ import org.junit.runner.RunWith
 import org.specs.runner.{JUnitSuiteRunner, JUnit4}
 import javax.ws.rs.core.UriInfo
 import java.lang.String
-import XmlHelper._
+import util.XmlHelper._
 import xml.Elem
-import FileHelper._
+import util.FileHelper._
 import org.specs.mock.Mockito
 import javax.management.{ObjectName, MBeanServerConnection}
 

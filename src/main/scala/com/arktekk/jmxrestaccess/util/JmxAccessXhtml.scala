@@ -1,4 +1,4 @@
-package com.arktekk.jmxrestaccess
+package com.arktekk.jmxrestaccess.util
 
 import xml.{NodeSeq, Elem}
 

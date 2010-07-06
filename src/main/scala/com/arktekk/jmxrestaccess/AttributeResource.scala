@@ -5,6 +5,7 @@ import java.net.URLDecoder
 import javax.management.ObjectName
 import javax.servlet.http.HttpServletRequest
 import javax.ws.rs.core.{Context, MediaType}
+import util.JmxAccessXhtml
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)

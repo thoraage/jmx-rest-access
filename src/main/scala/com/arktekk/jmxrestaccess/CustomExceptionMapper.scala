@@ -5,6 +5,7 @@ import javax.ws.rs.Produces
 import javax.ws.rs.core.{MediaType, Response}
 import org.apache.log4j.Logger
 import javax.management.{InstanceNotFoundException, AttributeNotFoundException, JMException}
+import util.JmxAccessXhtml
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)

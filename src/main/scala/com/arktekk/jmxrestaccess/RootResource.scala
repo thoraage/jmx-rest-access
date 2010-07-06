@@ -2,7 +2,7 @@ package com.arktekk.jmxrestaccess
 
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.http.Req
-import util.UriBuilder
+import util.{JmxAccessXhtml, UriBuilder}
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)

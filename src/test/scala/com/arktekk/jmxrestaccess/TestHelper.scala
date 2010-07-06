@@ -5,10 +5,9 @@ import com.sun.jersey.core.util.MultivaluedMapImpl
 import javax.ws.rs.core.{UriBuilder, PathSegment, UriInfo}
 import java.util.ArrayList
 import java.net.URI
+import util.FileHelper._
+import util.XmlHelper._
 import xml.Elem
-
-import XmlHelper._
-import FileHelper._
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)

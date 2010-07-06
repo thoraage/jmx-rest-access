@@ -1,4 +1,4 @@
-package com.arktekk.jmxrestaccess
+package com.arktekk.jmxrestaccess.util
 
 import java.io.File
 import java.lang.String

@@ -3,14 +3,15 @@ package com.arktekk.jmxrestaccess
 import javax.ws.rs.core.{UriInfo, Context, MediaType}
 import javax.servlet.http.HttpServletRequest
 import javax.ws.rs._
-import FileHelper._
 import java.io.{FileOutputStream, File}
 import java.nio.channels.Channels
+import util.JmxAccessXhtml
 import xml.{XML, Elem}
 import com.sun.jersey.api.NotFoundException
 import xml.parsing.ConstructingParser
 import io.Source
 import javax.management.ObjectName
+import util.FileHelper._
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
