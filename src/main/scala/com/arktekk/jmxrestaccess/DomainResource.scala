@@ -14,7 +14,7 @@ object DomainResourceImpl extends DomainResource with RestHelper {
       try {
         getAll(req, host)
       } catch {
-        case ResponseException(msg, response) => ResponseWithReason(response, msg)
+        case ResponseException(response) => ResponseWithReason(response, "")
       }
   }
 

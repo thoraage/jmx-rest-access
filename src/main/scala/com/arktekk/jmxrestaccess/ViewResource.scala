@@ -6,9 +6,7 @@ import javax.ws.rs._
 import java.io.{File, FileOutputStream}
 import java.nio.channels.Channels
 import jmx.{ResponseException, JMXHelper, JMXHelperImpl}
-import net.liftweb.http.{ResponseWithReason, GetRequest, Req}
 import util.JmxAccessXhtml
-import com.sun.jersey.api.NotFoundException
 import xml.parsing.ConstructingParser
 import io.Source
 import javax.management.ObjectName
@@ -16,6 +14,7 @@ import util.FileHelper._
 import util.UriBuilder
 import net.liftweb.http.rest.RestHelper
 import xml.{XML, Elem}
+import net.liftweb.http.{NotFoundResponse, ResponseWithReason, GetRequest, Req}
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
@@ -30,7 +29,13 @@ object ViewResourceImpl extends ViewResource with RestHelper {
       try {
         getAll(req, host)
       } catch {
-        case ResponseException(msg, response) => ResponseWithReason(response, msg)
+        case ResponseException(response) => ResponseWithReason(response, "")
+      }
+    case req@Req(ViewStateGet(host, view), _, GetRequest) =>
+      try {
+        getView(req, host, view)
+      } catch {
+        case ResponseException(response) => ResponseWithReason(response, "")
       }
   }
 }
@@ -42,6 +47,16 @@ object ViewGet {
     path match {
       case host :: "views" :: Nil => Some(host, None)
       case host :: "views" :: view :: Nil => Some(host, Some(view))
+      case _ => None
+    }
+}
+
+object ViewStateGet {
+  def apply(host: String, view: String): List[String] = host :: "views" :: view :: "states" :: Nil
+
+  def unapply(path: List[String]): Option[(String, String)] =
+    path match {
+      case host :: "views" :: view :: "states" :: Nil => Some(host, view)
       case _ => None
     }
 }
@@ -65,11 +80,9 @@ trait ViewResource {
       </span>)
   }
 
-  @Path("{view}/state")
-  @GET
-  def getView(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String, @PathParam("view") view: String) = {
-    val itemFiles = (getRepositoryDirectory /? host /? view).doOrElse({_.listFiles}, {_ => throw new NotFoundException})
-    val connection = getJmxHelper.getMBeanServerConnection(request, host)
+  def getView(req: Req, host: String, view: String) = {
+    val itemFiles = (getRepositoryDirectory /? host /? view).doOrElse({_.listFiles}, {_ => throw new ResponseException(new NotFoundResponse("View " + view + " not found at " + host))})
+    val connection = getJmxHelper.getMBeanServerConnection(req, host)
     val items = itemFiles.map {
       itemFile =>
         val document = ConstructingParser.fromSource(Source.fromFile(itemFile), false).document.docElem(0)

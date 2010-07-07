@@ -18,7 +18,7 @@ trait JMXHelper {
   def getMBeanServerConnection(req: Req, host: String): MBeanServerConnection
 }
 
-case class ResponseException(msg: String, response: LiftResponse) extends RuntimeException(msg)
+case class ResponseException(response: LiftResponse) extends RuntimeException()
 
 object JMXHelperImpl extends JMXHelper {
   val realm = "JMX multi-host domain"
@@ -27,7 +27,7 @@ object JMXHelperImpl extends JMXHelper {
 
   def getMBeanServerConnection(req: Req, host: String): MBeanServerConnection = {
     def unauthorisedException: Exception = {
-      new ResponseException("", UnauthorizedResponse(realm))
+      new ResponseException(UnauthorizedResponse(realm))
     }
     connectionMapVar.get.get(host) match {
       case None =>

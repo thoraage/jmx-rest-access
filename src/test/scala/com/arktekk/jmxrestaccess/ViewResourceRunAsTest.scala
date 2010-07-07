@@ -8,6 +8,7 @@ import javax.ws.rs.core.UriInfo
 import java.lang.String
 import xml.Elem
 import util.FileHelper._
+import util.XmlHelper._
 import org.specs.mock.Mockito
 import javax.management.{ObjectName, MBeanServerConnection}
 
@@ -65,7 +66,7 @@ object ViewResourceSpec extends Specification with Mockito {
         }
 
         "view item states can be retrieved" in {
-          val items = TestHelper.getManagementElement(viewResource.getView(uriInfo, null, host, viewName))
+          val items: Elem = null //TestHelper.getManagementElement(viewResource.getView(uriInfo, null, host, viewName))
           (items \ "span").whereAt("id", _ == "Name1").text.trim must_== "value1"
           (items \ "span").whereAt("id", _ == "Name2").text.trim must_== "value2"
         }
