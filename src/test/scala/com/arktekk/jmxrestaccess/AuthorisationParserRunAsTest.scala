@@ -1,5 +1,6 @@
 package com.arktekk.jmxrestaccess
 
+import jmx.AuthorisationParser
 import org.specs.Specification
 import org.specs.runner.{JUnitSuiteRunner, JUnit4}
 import org.junit.runner.RunWith

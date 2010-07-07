@@ -1,4 +1,4 @@
-package com.arktekk.jmxrestaccess
+package com.arktekk.jmxrestaccess.jmx
 
 import javax.management.remote.{JMXServiceURL, JMXConnector, JMXConnectorFactory}
 import java.util.{HashMap, Map => JMap}
@@ -6,8 +6,6 @@ import javax.management.MBeanServerConnection
 import javax.servlet.http.HttpServletRequest
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.{Response}
-import scala.util.parsing.combinator._
-import com.sun.jersey.core.util.Base64
 import net.liftweb.common.{Full, Box}
 import net.liftweb.http.{LiftResponse, UnauthorizedResponse, SessionVar, Req}
 
@@ -83,27 +81,6 @@ object JMXHelperImpl extends JMXHelper {
     jmxEnv.put(JMXConnector.CREDENTIALS, credentials)
     val connector = JMXConnectorFactory.connect(jmxUrl, jmxEnv)
     connector.getMBeanServerConnection()
-  }
-
-}
-
-object AuthorisationParser extends RegexParsers {
-  def base64decode(encoded: String) = new String(Base64.base64Decode(encoded))
-
-  val colonSplit = "([^:]+):(.*)".r
-
-  def userNamePassword(encoded: String) = base64decode(encoded) match {
-    case colonSplit(username, password) => Some(username, password)
-    case _ => None
-  }
-
-  def authorisation = """([^ ]+)""".r
-
-  def basic = "Basic " ~> authorisation ^^ userNamePassword
-
-  def find(input: String) = parseAll(basic, input) match {
-    case Success(Some(r), _) => r
-    case _ => error("Illegal input")
   }
 
 }

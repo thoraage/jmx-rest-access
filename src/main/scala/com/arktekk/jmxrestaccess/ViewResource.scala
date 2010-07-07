@@ -1,28 +1,49 @@
 package com.arktekk.jmxrestaccess
 
-import javax.ws.rs.core.{UriInfo, Context, MediaType}
+import javax.ws.rs.core.{UriInfo, Context}
 import javax.servlet.http.HttpServletRequest
 import javax.ws.rs._
-import java.io.{FileOutputStream, File}
+import java.io.{File, FileOutputStream}
 import java.nio.channels.Channels
+import jmx.{ResponseException, JMXHelper, JMXHelperImpl}
+import net.liftweb.http.{ResponseWithReason, GetRequest, Req}
 import util.JmxAccessXhtml
-import xml.{XML, Elem}
 import com.sun.jersey.api.NotFoundException
 import xml.parsing.ConstructingParser
 import io.Source
 import javax.management.ObjectName
 import util.FileHelper._
+import util.UriBuilder
+import net.liftweb.http.rest.RestHelper
+import xml.{XML, Elem}
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
  */
-
-@Path("rest/{host}/views")
-@Produces(Array(MediaType.APPLICATION_XML))
-class ViewResourceImpl extends ViewResource {
+object ViewResourceImpl extends ViewResource with RestHelper {
   def getJmxHelper = JMXHelperImpl
 
   def getRepositoryDirectory = new File(".") /! "repository"
+
+  serve {
+    case req@Req(ViewGet(host, None), _, GetRequest) =>
+      try {
+        getAll(req, host)
+      } catch {
+        case ResponseException(msg, response) => ResponseWithReason(response, msg)
+      }
+  }
+}
+
+object ViewGet {
+  def apply(host: String, view: Option[String]): List[String] = host :: "views" :: (if (view == None) Nil else view.get :: Nil)
+
+  def unapply(path: List[String]): Option[(String, Option[String])] =
+    path match {
+      case host :: "views" :: Nil => Some(host, None)
+      case host :: "views" :: view :: Nil => Some(host, Some(view))
+      case _ => None
+    }
 }
 
 trait ViewResource {
@@ -30,21 +51,16 @@ trait ViewResource {
 
   def getRepositoryDirectory: File
 
-  @GET
-  def getAll(@Context uriInfo: UriInfo, @Context request: HttpServletRequest, @PathParam("host") host: String) = {
+  def getAll(req: Req, host: String) = {
     val views = (getRepositoryDirectory /? host).doOrElse({_.listFiles.map(_.getName.replaceAll(".xml", ""))}, {_ => Array[String]()})
-    val viewLinks = views.map {
-      view =>
-        val url = UriBuilderHelper.cloneBaseUriBuilder(uriInfo).path(classOf[ViewResourceImpl]).path(classOf[ViewResourceImpl], "getView").build(host, view)
-        (view, url)
-    }
+    val viewLinks = views.map {view => (view, ViewGet(host, Some(view)))}
     JmxAccessXhtml.createHead("Views",
       <span>
         <li class="views">
           {viewLinks.map {pair => <a id={pair._1} href={pair._2.toString}/>}}
         </li>
         <span class="create-template">
-          {UriBuilderHelper.cloneBaseUriBuilder(uriInfo).path(classOf[ViewResourceImpl]).path(classOf[ViewResourceImpl], "createItem").build().toString.replaceAll("%7[bB]", "{").replaceAll("%7[dD]", "}")}
+          <a href={new UriBuilder(req, ViewGet(host, None)).uri}>Create view</a>
         </span>
       </span>)
   }

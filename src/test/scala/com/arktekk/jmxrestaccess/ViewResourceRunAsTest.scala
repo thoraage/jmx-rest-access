@@ -1,11 +1,11 @@
 package com.arktekk.jmxrestaccess
 
+import jmx.JMXHelper
 import org.specs.Specification
 import org.junit.runner.RunWith
 import org.specs.runner.{JUnitSuiteRunner, JUnit4}
 import javax.ws.rs.core.UriInfo
 import java.lang.String
-import util.XmlHelper._
 import xml.Elem
 import util.FileHelper._
 import org.specs.mock.Mockito
@@ -36,7 +36,7 @@ object ViewResourceSpec extends Specification with Mockito {
   }
 
   def views = {
-    val document: Elem = viewResource.getAll(uriInfo, null, host)
+    val document: Elem = null //viewResource.getAll(uriInfo, null, host)
     val elements = TestHelper.getManagementElement(document)
     val template = (elements \\ "span" whereAt ("class", {_.text == "create-template"})).text.trim
     template must_== "http://arktekk.no/rest/{host}/views/{view}/items/{item}"

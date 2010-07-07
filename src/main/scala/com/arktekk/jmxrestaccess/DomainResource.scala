@@ -1,5 +1,6 @@
 package com.arktekk.jmxrestaccess
 
+import jmx.{JMXHelperImpl, JMXHelper, ResponseException}
 import util.JmxAccessXhtml
 import xml.Elem
 import net.liftweb.http.rest.RestHelper

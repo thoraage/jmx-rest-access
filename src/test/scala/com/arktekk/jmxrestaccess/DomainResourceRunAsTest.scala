@@ -1,5 +1,6 @@
 package com.arktekk.jmxrestaccess
 
+import jmx.JMXHelper
 import org.junit.runner.RunWith
 import org.specs.runner.{JUnit4, JUnitSuiteRunner}
 import org.specs.Specification

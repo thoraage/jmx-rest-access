@@ -27,8 +27,7 @@ object RootResource extends RestHelper {
           }
         </li>
         <li class="views">
-          { //linkTo(req, host, classOf[ViewResource], "Views")
-          }
+          {linkTo(new UriBuilder(req, ViewGet(host, None)), "Views")}
         </li>
       </ul>)
   }

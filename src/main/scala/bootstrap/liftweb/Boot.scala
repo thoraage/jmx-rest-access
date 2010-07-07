@@ -1,7 +1,7 @@
 package bootstrap.liftweb
 
 import net.liftweb.http.LiftRules
-import com.arktekk.jmxrestaccess.{DomainResourceImpl, RootResource}
+import com.arktekk.jmxrestaccess.{ViewResourceImpl, DomainResourceImpl, RootResource}
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
@@ -9,7 +9,7 @@ import com.arktekk.jmxrestaccess.{DomainResourceImpl, RootResource}
 
 class Boot {
   def boot {
-    LiftRules.dispatch.append(RootResource).append(DomainResourceImpl)
+    LiftRules.dispatch.append(RootResource).append(DomainResourceImpl).append(ViewResourceImpl)
   }
 }
 

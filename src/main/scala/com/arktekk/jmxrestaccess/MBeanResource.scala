@@ -4,6 +4,7 @@ import collection.jcl.SetWrapper
 import javax.ws.rs._
 import core.{Context, UriInfo, MediaType}
 import javax.management.{ObjectName}
+import jmx.JMXHelperImpl
 import util.JmxAccessXhtml
 import xml.Elem
 import java.net.{URLDecoder, URLEncoder}
