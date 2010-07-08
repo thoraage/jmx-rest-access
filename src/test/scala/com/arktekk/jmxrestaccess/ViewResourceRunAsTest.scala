@@ -54,11 +54,11 @@ object ViewResourceSpec extends Specification with Mockito {
             <a href="/rest/anyhost:8080/rest/host/mbeans/d:k=v/attributes/attrName1"/>
         </span>
         val viewName = "MyView"
-        viewResource.createItem(uriInfo, null, host, viewName, "Name1", elem1)
+        //viewResource.createItem(uriInfo, null, host, viewName, "Name1", elem1)
         val elem2 = <span>
             <a href="/rest/anyhost:8080/rest/host/mbeans/d:k=v/attributes/attrName2"/>
         </span>
-        viewResource.createItem(uriInfo, null, host, viewName, "Name2", elem2)
+        //viewResource.createItem(uriInfo, null, host, viewName, "Name2", elem2)
 
         "views can be listed" in {
           views.size must_== 1

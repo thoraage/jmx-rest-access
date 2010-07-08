@@ -1,7 +1,8 @@
 package com.arktekk.jmxrestaccess
 
-import jmx.{JMXHelperImpl, JMXHelper, ResponseException}
+import jmx.{JMXHelperImpl, JMXHelper}
 import util.JmxAccessXhtml
+import util.ExceptionHandler._
 import xml.Elem
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.http._
@@ -10,17 +11,12 @@ object DomainResourceImpl extends DomainResource with RestHelper {
   def jmxHelper = JMXHelperImpl
 
   serve {
-    case req@Req(DomainGet(host), _, GetRequest) =>
-      try {
-        getAll(req, host)
-      } catch {
-        case ResponseException(response) => ResponseWithReason(response, "")
-      }
+    case req@Req(DomainUri(host), _, GetRequest) => contain {getAll(req, host)}
   }
 
 }
 
-object DomainGet {
+object DomainUri {
   def apply(host: String) = host :: "domains" :: Nil
 
   def unapply(path: List[String]): Option[String] =
