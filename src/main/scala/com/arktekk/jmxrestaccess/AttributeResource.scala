@@ -8,6 +8,16 @@ import javax.ws.rs.core.{Context, MediaType}
 import jmx.JMXHelperImpl
 import util.JmxAccessXhtml
 
+object AttributeUri {
+  def apply(host: String, domainAndKeys: String, attributeName: String): List[String] = MBeanUri(host, domainAndKeys, attributeName :: Nil)
+
+  def unapply(path: List[String]): Option[(String, String, String)] =
+    path match {
+      case MBeanUri(host, domainAndKeys, attributeName :: Nil) => Some(host, domainAndKeys, attributeName)
+      case _ => None
+    }
+}
+
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
  */

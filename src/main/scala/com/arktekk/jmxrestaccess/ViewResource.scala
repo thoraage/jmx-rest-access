@@ -12,7 +12,7 @@ import util.UriBuilder
 import util.ExceptionHandler._
 import net.liftweb.http.rest.RestHelper
 import xml.{XML, Elem}
-import net.liftweb.http.{NotFoundResponse, GetRequest, Req}
+import net.liftweb.http.{PutRequest, NotFoundResponse, GetRequest, Req}
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
@@ -23,9 +23,9 @@ object ViewResourceImpl extends ViewResource with RestHelper {
   def getRepositoryDirectory = new File(".") /! "repository"
 
   serve {
-    case req@Req(ViewsUri(host, Nil), _, GetRequest) => contain {getAll(req, host)}
-    case req@Req(StatesUri(host, view), _, GetRequest) => contain {getViewState(req, host, view)}
-    case req@Req(ItemUri(host, view, item), _, GetRequest) => contain {<b/>}
+    case req@Req(ViewsUri(host, Nil), _, GetRequest) => contain {() => getAll(req, host)}
+    case req@Req(StatesUri(host, view), _, GetRequest) => contain {() => getViewState(req, host, view)}
+    case req@Req(ItemUri(host, view, item), _, PutRequest) => contain {() => <b/>}
   }
 }
 

@@ -20,11 +20,10 @@ object RootResource extends RestHelper {
     JmxAccessXhtml.createHead("Root",
       <ul>
         <li class="domains">
-          {linkTo(new UriBuilder(req, DomainUri(host)), "Domains")}
+          {linkTo(new UriBuilder(req, DomainsUri(host, Nil)), "Domains")}
         </li>
         <li class="mbeans">
-          { //linkTo(req, host, classOf[MBeanResource], "MBeans")
-          }
+          {linkTo(new UriBuilder(req, MBeansUri(host, Nil)), "MBeans")}
         </li>
         <li class="views">
           {linkTo(new UriBuilder(req, ViewsUri(host, Nil)), "Views")}
