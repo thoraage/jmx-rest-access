@@ -1,12 +1,12 @@
 package com.arktekk.jmxrestaccess
 
-import javax.ws.rs.{PathParam, GET, Produces, Path}
 import java.net.URLDecoder
 import javax.management.ObjectName
-import javax.servlet.http.HttpServletRequest
-import javax.ws.rs.core.{Context, MediaType}
 import jmx.JMXHelperImpl
 import util.JmxAccessXhtml
+import util.ExceptionHandler._
+import net.liftweb.http.rest.RestHelper
+import net.liftweb.http.{GetRequest, Req}
 
 object AttributeUri {
   def apply(host: String, domainAndKeys: String, attributeName: String): List[String] = MBeanUri(host, domainAndKeys, attributeName :: Nil)
@@ -21,13 +21,13 @@ object AttributeUri {
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
  */
-@Path("rest/{host}/mbeans/{domainAndKeys}/attributes")
-@Produces(Array(MediaType.APPLICATION_XML))
-class AttributeResource {
-  @GET
-  @Path("{attributeName}")
-  def get(@PathParam("domainAndKeys") urlEncodedDomainAndKeys: String, @PathParam("attributeName") attributeName: String, @Context request: HttpServletRequest, @PathParam("host") host: String) = {
-    val connection = JMXHelperImpl.getMBeanServerConnection(request, host)
+object AttributeResource extends RestHelper {
+  serve {
+    case req@Req(AttributeUri(host, domainAndKeys, attributeName), _, GetRequest) => contain {() => get(req, domainAndKeys, attributeName, host)}
+  }
+
+  def get(req: Req, urlEncodedDomainAndKeys: String, attributeName: String, host: String) = {
+    val connection = JMXHelperImpl.getMBeanServerConnection(req, host)
     val domainAndKeys = URLDecoder.decode(urlEncodedDomainAndKeys, "UTF-8")
     val value = connection.getAttribute(new ObjectName(domainAndKeys), attributeName)
     JmxAccessXhtml.createHead("Attribute " + attributeName,
