@@ -46,9 +46,9 @@ object MBeanUri {
  */
 object MBeanResource extends RestHelper {
   serve {
-    case req@Req(MBeansUri(host, Nil), _, GetRequest) => contain {() => getAll(req, host, null)}
-    case req@Req(DomainMBeansUri(host, domainName), _, GetRequest) => contain {() => getAll(req, host, domainName)}
-    case req@Req(MBeanUri(host, domainAndKeys, Nil), _, GetRequest) => contain {() => get(req, host, domainAndKeys)}
+    case req@Req(MBeansUri(host, Nil), _, GetRequest) => contain {getAll(req, host, null)}
+    case req@Req(DomainMBeansUri(host, domainName), _, GetRequest) => contain {getAll(req, host, domainName)}
+    case req@Req(MBeanUri(host, domainAndKeys, Nil), _, GetRequest) => contain {get(req, host, domainAndKeys)}
   }
 
   def getAll(req: Req, host: String, domainName: String): Elem = {

@@ -1,19 +1,15 @@
 package com.arktekk.jmxrestaccess
 
 import net.liftweb.http.rest.RestHelper
-import net.liftweb.http.Req
 import util.{JmxAccessXhtml, UriBuilder}
+import net.liftweb.http.{GetRequest, Req}
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
  */
 object RootResource extends RestHelper {
-  object Tull {
-    def unapply(r: Req): Option[(List[String], Req)] = Some(r.path.partPath -> r)
-  }
-
   serve {
-    case req@Tull(host :: Nil, _) => get(req, host)
+    case req@Req(host :: Nil, _, GetRequest) => get(req, host)
   }
 
   def get(req: Req, host: String) = {

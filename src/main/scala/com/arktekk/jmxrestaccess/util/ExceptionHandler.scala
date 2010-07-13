@@ -10,9 +10,9 @@ import net.liftweb.http.{LiftResponse, XmlResponse, ResponseWithReason}
  */
 
 object ExceptionHandler {
-  def contain(f: () => Node): Box[LiftResponse] = {
+  def contain(f: => Node): Box[LiftResponse] = {
     try {
-      Full(XmlResponse(f()))
+      Full(XmlResponse(f))
     } catch {
       case ResponseException(response) => Full(ResponseWithReason(response, ""))
     }

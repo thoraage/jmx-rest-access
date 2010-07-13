@@ -23,7 +23,7 @@ object AttributeUri {
  */
 object AttributeResource extends RestHelper {
   serve {
-    case req@Req(AttributeUri(host, domainAndKeys, attributeName), _, GetRequest) => contain {() => get(req, domainAndKeys, attributeName, host)}
+    case req@Req(AttributeUri(host, domainAndKeys, attributeName), _, GetRequest) => contain {get(req, domainAndKeys, attributeName, host)}
   }
 
   def get(req: Req, urlEncodedDomainAndKeys: String, attributeName: String, host: String) = {
