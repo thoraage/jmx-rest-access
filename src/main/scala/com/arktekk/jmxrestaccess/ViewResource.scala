@@ -23,9 +23,10 @@ object ViewResourceImpl extends ViewResource with RestHelper {
   def getRepositoryDirectory = new File(".") /! "repository"
 
   serve {
-    case req@Req(ViewsUri(host, Nil), _, GetRequest) => contain {() => getAll(req, host)}
-    case req@Req(StatesUri(host, view), _, GetRequest) => contain {() => getViewState(req, host, view)}
-    case req@Req(ItemUri(host, view, item), _, PutRequest) => contain {() => <b/>}
+    case req@Req(ViewsUri(host, Nil), _, GetRequest) => contain {getAll(req, host)}
+    case req@Req(StatesUri(host, view), _, GetRequest) => contain {getViewState(req, host, view)}
+    case req@Req(ItemUri(host, view, item), _, PutRequest) => 
+      contain {<b/>}
   }
 }
 
@@ -79,11 +80,11 @@ trait ViewResource {
     val viewLinks = views.map {view => (view, ViewUri(host, view, Nil))}
     JmxAccessXhtml.createHead("Views",
       <span>
-        <li class="views">
-          {viewLinks.map {pair => <a id={pair._1} href={pair._2.toString}/>}}
-        </li>
-        <span class="create-template">
-          <a href={new UriBuilder(req, ViewsUri(host, Nil)).uri}>Create view</a>
+        <span class="views">
+          {viewLinks.map {pair => <li><a id={pair._1} href={pair._2.toString}/></li>}}
+        </span>
+        <span class="update-view-item">
+          <a href={new UriBuilder(req, ItemUri(host, "{viewName}", "{itemName}")).uri}>Update view item</a>
         </span>
       </span>)
   }
