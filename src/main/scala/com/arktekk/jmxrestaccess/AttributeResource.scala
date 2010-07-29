@@ -9,11 +9,11 @@ import net.liftweb.http.rest.RestHelper
 import net.liftweb.http.{GetRequest, Req}
 
 object AttributeUri {
-  def apply(host: String, domainAndKeys: String, attributeName: String): List[String] = MBeanUri(host, domainAndKeys, attributeName :: Nil)
+  def apply(host: String, domainAndKeys: String, attributeName: String): List[String] = MBeanUri(host, domainAndKeys, "attributes" :: attributeName :: Nil)
 
   def unapply(path: List[String]): Option[(String, String, String)] =
     path match {
-      case MBeanUri(host, domainAndKeys, attributeName :: Nil) => Some(host, domainAndKeys, attributeName)
+      case MBeanUri(host, domainAndKeys, "attributes" :: attributeName :: Nil) => Some(host, domainAndKeys, attributeName)
       case _ => None
     }
 }
@@ -23,7 +23,7 @@ object AttributeUri {
  */
 object AttributeResource extends RestHelper {
   serve {
-    case req@Req(AttributeUri(host, domainAndKeys, attributeName), _, GetRequest) => contain {get(req, domainAndKeys, attributeName, host)}
+    case req@Req(AttributeUri(host, domainAndKeys, attributeName), _, GetRequest) => contain {Some(get(req, domainAndKeys, attributeName, host))}
   }
 
   def get(req: Req, urlEncodedDomainAndKeys: String, attributeName: String, host: String) = {

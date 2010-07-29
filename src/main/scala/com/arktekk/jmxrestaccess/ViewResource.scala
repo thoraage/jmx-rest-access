@@ -12,7 +12,9 @@ import util.UriBuilder
 import util.ExceptionHandler._
 import net.liftweb.http.rest.RestHelper
 import xml.{XML, Elem}
-import net.liftweb.http.{PutRequest, NotFoundResponse, GetRequest, Req}
+import net.liftweb.common.{Full, Box}
+import net.liftweb.http._
+import java.net.URLDecoder
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
@@ -23,10 +25,13 @@ object ViewResourceImpl extends ViewResource with RestHelper {
   def getRepositoryDirectory = new File(".") /! "repository"
 
   serve {
-    case req@Req(ViewsUri(host, Nil), _, GetRequest) => contain {getAll(req, host)}
-    case req@Req(StatesUri(host, view), _, GetRequest) => contain {getViewState(req, host, view)}
-    case req@Req(ItemUri(host, view, item), _, PutRequest) => 
-      contain {<b/>}
+    case req@Req(ViewsUri(host, Nil), _, GetRequest) => contain {Some(getAll(req, host))}
+    case req@Req(StatesUri(host, view), _, GetRequest) => contain {Some(getViewState(req, host, view))}
+    case req@Req(ItemUri(host, view, item), _, PutRequest) =>
+      contain {
+        createItem(req, host, view, item, req.xml)
+        None
+      }
   }
 }
 
@@ -77,11 +82,15 @@ trait ViewResource {
 
   def getAll(req: Req, host: String) = {
     val views = (getRepositoryDirectory /? host).doOrElse({_.listFiles.map(_.getName.replaceAll(".xml", ""))}, {_ => Array[String]()})
-    val viewLinks = views.map {view => (view, ViewUri(host, view, Nil))}
+    val viewLinks = views.map {view => (view, new UriBuilder(req, ViewUri(host, view, Nil)).uri, new UriBuilder(req, StatesUri(host, view)).uri)}
     JmxAccessXhtml.createHead("Views",
       <span>
         <span class="views">
-          {viewLinks.map {pair => <li><a id={pair._1} href={pair._2.toString}/></li>}}
+          {viewLinks.map {
+          pair => <li id={pair._1}>
+            {pair._1}<a href={pair._2.toString}>Change</a> <a href={pair._3.toString}>States</a>
+          </li>
+        }}
         </span>
         <span class="update-view-item">
           <a href={new UriBuilder(req, ItemUri(host, "{viewName}", "{itemName}")).uri}>Update view item</a>
@@ -99,19 +108,23 @@ trait ViewResource {
         val parser = ".*/mbeans/(.*)/attributes/(.*)".r
         href match {
           case parser(mbeanName, attributeName) =>
-            val value = connection.getAttribute(new ObjectName(mbeanName), attributeName);
+            val value = connection.getAttribute(new ObjectName(URLDecoder.decode(mbeanName)), attributeName);
             <span id={itemFile.getNameWithoutExtension}>
               {value}
             </span>
         }
     }
-    JmxAccessXhtml.createHead("Views", items)
+    JmxAccessXhtml.createHead("View States", items)
   }
 
-  def createItem(req: Req, host: String, view: String, item: String, document: Elem): Unit = {
-    val file = getRepositoryDirectory /! host /! view /? (item + ".xml")
-    using(Channels.newWriter(new FileOutputStream(file).getChannel, UTF8)) {
-      writer => XML.write(writer, document, UTF8, true, null)
+  def createItem(req: Req, host: String, view: String, item: String, document: Box[Elem]): Unit = {
+    document match {
+      case Full(document) =>
+        val file = getRepositoryDirectory /! host /! view /? (item + ".xml")
+        using(Channels.newWriter(new FileOutputStream(file).getChannel, UTF8)) {
+          writer => XML.write(writer, document, UTF8, true, null)
+        }
+      case _ => throw new ResponseException(BadResponse());
     }
   }
 

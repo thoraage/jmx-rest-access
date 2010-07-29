@@ -1,18 +1,21 @@
 package com.arktekk.jmxrestaccess.util
 
 import com.arktekk.jmxrestaccess.jmx.ResponseException
-import net.liftweb.common.{Full, Box}
 import xml.Node
-import net.liftweb.http.{LiftResponse, XmlResponse, ResponseWithReason}
+import net.liftweb.common.{Full, Box}
+import net.liftweb.http.{NoContentResponse, LiftResponse, XmlResponse, ResponseWithReason}
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
  */
 
 object ExceptionHandler {
-  def contain(f: => Node): Box[LiftResponse] = {
+  def contain(f: => Option[Node]): Box[LiftResponse] = {
     try {
-      Full(XmlResponse(f))
+      f match {
+        case Some(node) => Full(XmlResponse(node))
+        case None => Full(NoContentResponse())
+      }
     } catch {
       case ResponseException(response) => Full(ResponseWithReason(response, ""))
     }

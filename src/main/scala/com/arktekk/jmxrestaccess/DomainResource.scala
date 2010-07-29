@@ -12,7 +12,7 @@ object DomainResourceImpl extends DomainResource with RestHelper {
   def jmxHelper = JMXHelperImpl
 
   serve {
-    case req@Req(DomainsUri(host, Nil), _, GetRequest) => contain {getAll(req, host)}
+    case req@Req(DomainsUri(host, Nil), _, GetRequest) => contain {Some(getAll(req, host))}
   }
 
 }
