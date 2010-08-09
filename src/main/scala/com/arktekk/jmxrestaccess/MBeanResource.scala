@@ -75,7 +75,7 @@ object MBeanResource extends RestHelper {
         <ul>
           {info.getAttributes.map(attributeInfo =>
           <li>
-            <a class="attribute" href={new UriBuilder(req, AttributeUri(host, URLEncoder.encode(domainAndKeys, "UTF-8").toString, attributeInfo.getName)).uri}>
+            <a class="attribute" href={new UriBuilder(req, AttributeUri(host, domainAndKeys, attributeInfo.getName)).uri}>
               {attributeInfo.getName}
             </a>
           </li>)}
