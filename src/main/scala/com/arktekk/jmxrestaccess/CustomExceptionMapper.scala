@@ -5,6 +5,7 @@ import javax.ws.rs.Produces
 import javax.ws.rs.core.{MediaType, Response}
 import org.apache.log4j.Logger
 import javax.management.{InstanceNotFoundException, AttributeNotFoundException, JMException}
+import util.JmxAccessXhtml
 
 /**
  * @author Thor Åge Eldby (thoraageeldby@gmail.com)
@@ -26,7 +27,7 @@ class CustomExceptionMapper extends ExceptionMapper[JMException] {
       (Response.Status.INTERNAL_SERVER_ERROR, null)
     CustomExceptionMapper.logger.error("Error from resources", ex)
     Response.status(status).entity(
-      XHTML.createHead(status.getReasonPhrase,
+      JmxAccessXhtml.createHead(status.getReasonPhrase,
         <span class="management error">
           {message}
           -

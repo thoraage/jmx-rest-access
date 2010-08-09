@@ -10,7 +10,6 @@ import org.mortbay.jetty.webapp.WebAppContext
  */
 object Portal {
   def main(args: Array[String]): Unit = new PortalImpl
-
 }
 
 class PortalImpl {
@@ -20,7 +19,7 @@ class PortalImpl {
   server.setConnectors(Array(connector));
   val context = new WebAppContext();
   context.setContextPath("/");
-  val paths = new ResourceCollection(Array(TestHelper.getWebAppDir(this.getClass())));
+  val paths = new ResourceCollection(Array(TestHelper.getWebAppDir(this.getClass).toString));
   context.setBaseResource(paths);
   server.addHandler(context);
   server.start();
